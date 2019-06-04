@@ -1,0 +1,4 @@
+name = "OceanCirculations"
+uuid = "afed1364-8665-11e9-2902-1b1fcebd056f"
+authors = ["Benoit Pasquier <pasquieb@uci.edu>"]
+version = "0.1.0"
