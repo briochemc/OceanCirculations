@@ -1,5 +1,5 @@
 module OceanCirculations
 
-greet() = print("Hello World!")
+greet() = print("This is not a package!")
 
 end # module
