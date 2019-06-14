@@ -1,5 +1,7 @@
 #=
-This
+The code below loads the grid information and transport matrix
+from the OCIM (from Tim DeVries)
+and adapt it to AIBECS.
 =#
 
 using SparseArrays          # For sparse matrix in OCIM
@@ -62,7 +64,7 @@ depth_top = depth_top_3D[1,1,:]
 A_2D = grd["Areat"] * u"m^2"
 nlat, nlon, ndepth = size(grd["XT3d"])
 nboxes = length(grd["XT3d"])
-grid = OceanGrid(
+grid = OceanRectilinearGrid(
                  lat,
                  lon,
                  depth,
@@ -89,7 +91,9 @@ grid = OceanGrid(
 println("  Wet boxes")
 wet3D = convert(BitArray{3}, vars["output"]["M3d"])
 
-bson_dir = joinpath(splitpath(mat_file)[1:end-2]... ,"OCIM1_BSON")
+data_path = "/Users/benoitpasquier/Data"
+bson_dir = joinpath(data_path, "OceanGrids")
+println("Saving as BSON file in $bson_dir")
 bson_file = joinpath(bson_dir, "OCIM1.bson")
 isdir(bson_dir) || mkdir(bson_dir)
 isfile(bson_file) && rm(bson_file)
