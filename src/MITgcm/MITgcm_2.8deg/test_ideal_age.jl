@@ -1,23 +1,15 @@
 #=
-The code below loads the grid information and transport matrix
-from the MITgcm ocean circulation model (from Samar Kathiwala)
-and adapt it to AIBECS.
-
-Note the TMM uses a different indexing of the 3D grid.
-(The longitudes are traversed before the latitudes)
+This is to test the ideal age computation
 =#
 
 using SparseArrays          # For sparse matrix
-using DataDeps              # For storage location of data
 using MAT                   # For loading MAT format
-using BSON                  # For saving circulation as BSON format
-using Unitful, UnitfulAstro # for units
-using OceanGrids            # To store the grid
+using LinearAlgebra
 
 # No download, this is a local test file
 
 println("Reading grid file (grid data)")
-data_path = "/Users/benoitpasquier/Data"
+data_path = ""
 mat_boxes_file = joinpath(data_path, "MITgcm_2.8deg/Matrix5/Data/boxes.mat")
 boxes = matread(mat_boxes_file)
 mat_grd_file = joinpath(data_path, "MITgcm_2.8deg/grid.mat")
@@ -28,16 +20,57 @@ mat_Matrix_file = joinpath(data_path, "MITgcm_2.8deg/Matrix5/TMs/matrix_nocorrec
 vars = matread(mat_Matrix_file)
 
 println("  Wet boxes")
-wet3D_orig = convert(BitArray{3}, grd["bathy"])
-iwet_orig = findall(vec(wet3D_orig))
-wet3D = permutedims(wet3D_orig, [2, 1, 3])
+wet3D = convert(BitArray{3}, grd["bathy"])
 iwet = findall(vec(wet3D))
-permuted_iwet = permutedims(LinearIndices(size(wet3D)), [2, 1, 3])[iwet_orig]
-p = sortperm(permuted_iwet)
 
 println("  Circulation (T)")
-Te = -vars["Aexpms"][p,p] * upreferred(u"1/yr") # TODO check unit and direction is correct!
-Ti = -vars["Aimpms"][p,p] * upreferred(u"1/yr") # TODO check unit and direction is correct!
+Te = vars["Aexpms"]
+Ti = vars["Aimpms"]
+
+#=
+The equation for the ideal mean age is
+
+∂a/∂t + T a = 1 - Λ a
+
+where Λ = Diagonal(z == z_surface) / τ and τ = 1s
+
+But we don't have T here, using the TMM.
+With the TMM, we have Ti and Te, and the time stepping is done via
+
+a(i+1) = Ti (Te a(i) + τ_T sms)
+
+So the steady-state solution is given by
+
+(I - Ti Te) a = τ_T Ti sms
+
+Here sms = 1 - Λ a, so we solve
+
+(I - Ti Te + τ_t Ti Λ) a = τ_T Ti 1
+
+or 
+
+a = M \ rhs
+=#
+τ_T = grd["deltaT"]
+z = vec(boxes["Zbox"])
+Λ = sparse(Diagonal(z .< 30)) / 1
+
+M = I - Ti * Te + τ_T * Ti * Λ
+
+nb = length(z)
+rhs = τ_T * Ti * ones(nb)
+
+a = M \ rhs
+
+#=
+With operator splitting
+=#
+
+i = findall(z .> 30) # indices of interior boxes
+
+a = (Ti[i,i] * Te[i,i] - I) \ (-τ_T * Ti[i,i] * ones(length(i)))
+
+
 
 println("  Grid")
 lat = vec(grd["y"]) * u"°"
