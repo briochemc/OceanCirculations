@@ -43,6 +43,9 @@ vars = matread(mat_file)
 println("  Circulation")
 T = -vars["output"]["TR"] * upreferred(u"1/yr")
 
+println("  Wet boxes")
+wet3D = convert(BitArray{3}, vars["output"]["M3d"])
+
 println("  Grid")
 grd = vars["output"]["grid"]
 lat = vec(grd["yt"]) * u"°"
@@ -82,14 +85,12 @@ grid = OceanRectilinearGrid(
                  depth_top,
                  depth_top_3D,
                  A_2D,
+                 wet3D,
                  nlon,
                  nlat,
                  ndepth,
                  nboxes
                 )
-
-println("  Wet boxes")
-wet3D = convert(BitArray{3}, vars["output"]["M3d"])
 
 data_path = "/Users/benoitpasquier/Data"
 bson_dir = joinpath(data_path, "OceanGrids")
@@ -97,4 +98,4 @@ println("Saving as BSON file in $bson_dir")
 bson_file = joinpath(bson_dir, "OCIM1.bson")
 isdir(bson_dir) || mkdir(bson_dir)
 isfile(bson_file) && rm(bson_file)
-BSON.@save bson_file grid wet3D T
+BSON.@save bson_file grid T

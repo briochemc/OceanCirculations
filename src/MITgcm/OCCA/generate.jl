@@ -1,7 +1,7 @@
 #=
 The code below loads the grid information and transport matrix
-from the OCIM0 (from Francois Primeau and Tim DeVries)
-and adapt them to AIBECS.
+from the OCCA output by Gael Forget
+and adapts them to AIBECS.
 =#
 
 using SparseArrays          # For sparse matrix in OCIM
@@ -10,26 +10,29 @@ using BSON                  # For saving circulation as BSON format
 using Unitful, UnitfulAstro # for units
 using OceanGrids            # To store the grid
 
-
-
-println("Reading OCIM0 MAT file")
+println("Reading OCCA MAT file")
 data_path = "/Users/benoitpasquier/Data"
-mat_file = joinpath(data_path, "OCIM0.1.mat")
+mat_file = joinpath(data_path, "OCCA-TRM", "matrix_10.mat")
 vars = matread(mat_file)
 
-println("  Circulation")
-T = vars["T"] * u"1/s"
 
 println("  Wet boxes")
-wet3D = convert(BitArray{3}, vars["M3d"])
+wet3D_orig = vars["mask2x2"] .== 1
+iwet_orig = findall(vec(wet3D_orig))
+wet3D = permutedims(wet3D_orig, [2,1,3]) # swap lat and lon
+iwet = findall(vec(wet3D))
+permuted_iwet = permutedims(LinearIndices(size(wet3D)), [2, 1, 3])[iwet_orig]
+p = sortperm(permuted_iwet)
+
+println("  Circulation")
+T = (-vars["A_adv"] - vars["A_dif"])[p,p] * u"1/s" # `p` swaps lat and lon? TODO check
 
 println("  Grid")
-grd = vars["grid"]
-lat = vec(grd["yt"]) * u"°"
-lon = vec(grd["xt"]) * u"°"
-depth = vec(grd["zt"]) * u"m"
-δlat = vec(grd["dyt"]) * u"°"
-δlon = vec(grd["dxt"]) * u"°"
+lat = vars["YC2x2"][1,:] * u"°"
+lon = vars["XC2x2"][:,1] * u"°"
+depth = vec(vars["RC2x2"]) * u"m"
+δlat = fill(2u"°", size(lat))
+δlon = fill(2u"°", size(lon))
 δdepth = vec(grd["dzt"]) * u"m"
 lat_3D = grd["YT3d"] * u"°"
 lon_3D = grd["XT3d"] * u"°"
@@ -68,11 +71,3 @@ grid = OceanRectilinearGrid(
                  ndepth,
                  nboxes
                 )
-
-data_path = "/Users/benoitpasquier/Data"
-bson_dir = joinpath(data_path, "OceanGrids")
-println("Saving as BSON file in $bson_dir")
-bson_file = joinpath(bson_dir, "OCIM0.1.bson")
-isdir(bson_dir) || mkdir(bson_dir)
-isfile(bson_file) && rm(bson_file)
-BSON.@save bson_file grid T
