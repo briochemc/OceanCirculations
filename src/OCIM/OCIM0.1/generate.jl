@@ -7,7 +7,7 @@ and adapt them to AIBECS.
 using SparseArrays          # For sparse matrix in OCIM
 using MAT                   # For loading OCIM in MAT format
 using BSON                  # For saving circulation as BSON format
-using Unitful, UnitfulAstro # for units
+using Unitful               # for units
 using OceanGrids            # To store the grid
 
 

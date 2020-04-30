@@ -8,7 +8,7 @@ using SparseArrays          # For sparse matrix
 using DataDeps              # For storage location of data
 using MAT                   # For loading MAT format
 using BSON                  # For saving circulation as BSON format
-using Unitful, UnitfulAstro # for units
+using Unitful               # for units
 using OceanGrids            # To store the grid
 
 # No download, this is a local test file

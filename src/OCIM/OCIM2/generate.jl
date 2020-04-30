@@ -9,7 +9,7 @@ using DataDeps              # For storage location of data
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true # so it does not ask me
 using MAT                   # For loading OCIM in MAT format
 using BSON                  # For saving circulation as BSON format
-using Unitful, UnitfulAstro # for units
+using Unitful               # for units
 using OceanGrids            # To store the grid
 
 # fallback for download
