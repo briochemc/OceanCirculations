@@ -31,7 +31,7 @@ register(
         - DeVries, T. and F. Primeau, 2011: Dynamically and Observationally Constrained Estimates of Water-Mass Distributions and Ages in the Global Ocean. J. Phys. Oceanogr., 41, 2381–2401, doi:10.1175/JPO-D-10-05011.1
         """,
         "https://dl.dropboxusercontent.com/s/n0j1swt4bqgbj75/CTL.mat",
-        sha2_256,
+        "347a6bb17676f957c6f56c46313d11298e4764f6f5d0304b7ea8374108fb442f",
         fetch_method = fallback_download
     )
 )
@@ -95,7 +95,7 @@ grid = OceanRectilinearGrid(
 data_path = "/Users/benoitpasquier/Data"
 bson_dir = joinpath(data_path, "OceanGrids")
 println("Saving as BSON file in $bson_dir")
-bson_file = joinpath(bson_dir, "OCIM1.bson")
+bson_file = joinpath(bson_dir, "OCIM1_CTL.bson")
 isdir(bson_dir) || mkdir(bson_dir)
 isfile(bson_file) && rm(bson_file)
 BSON.@save bson_file grid T
