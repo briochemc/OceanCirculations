@@ -2,3 +2,12 @@ name = "OceanCirculations"
 uuid = "afed1364-8665-11e9-2902-1b1fcebd056f"
 authors = ["Benoit Pasquier <briochemc@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+OceanGrids = "cfe838f4-859f-11e9-2ea1-df7d4e7c3537"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
