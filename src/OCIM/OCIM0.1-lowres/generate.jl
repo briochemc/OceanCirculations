@@ -75,4 +75,4 @@ println("Saving as JLD2 file in $oceancirc_dir")
 circ_file = joinpath(oceancirc_dir, "OCIM0.1-lowres.jld2")
 isdir(oceancirc_dir) || mkdir(oceancirc_dir)
 isfile(circ_file) && rm(circ_file)
-JLD2.@save circ_file grid T
+jldsave(circ_file, true; grid, T)

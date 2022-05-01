@@ -7,7 +7,7 @@ and adapts them to AIBECS.
 using SparseArrays          # For sparse matrix
 using LinearAlgebra
 using MAT                   # For loading OCCA in MAT format
-using BSON                  # For saving circulation as BSON format
+using JLD2                  # For saving circulation as JLD2 format
 using Unitful               # for units
 using Unitful: °, m, km, s  # for units
 using OceanGrids            # To store the grid
@@ -117,12 +117,12 @@ T = (-1/s) * sparse(Diagonal(inv.(v))) * (vars["A_adv"] + vars["A_dif"])[p,p] # 
 
 name = "OCCA"
 data_path = "/Users/benoitpasquier/Data"
-bson_dir = joinpath(data_path, "OceanGrids")
-println("Saving as BSON file in $bson_dir")
-bson_file = joinpath(bson_dir, "$name.bson")
-isdir(bson_dir) || mkdir(bson_dir)
-isfile(bson_file) && rm(bson_file)
+jld2_dir = joinpath(data_path, "OceanGrids")
+println("Saving as JLD2 file in $jld2_dir")
+jld2_file = joinpath(jld2_dir, "$name.jld2")
+isdir(jld2_dir) || mkdir(jld2_dir)
+isfile(jld2_file) && rm(jld2_file)
 
-BSON.@save bson_file grid T
+jldsave(jld2_file, true; grid, T)
 
 

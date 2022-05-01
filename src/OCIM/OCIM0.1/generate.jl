@@ -6,7 +6,7 @@ and adapt them to AIBECS.
 
 using SparseArrays          # For sparse matrix in OCIM
 using MAT                   # For loading OCIM in MAT format
-using BSON                  # For saving circulation as BSON format
+using JLD2                  # For saving circulation as JLD2 format
 using Unitful               # for units
 using OceanGrids            # To store the grid
 
@@ -70,9 +70,9 @@ grid = OceanRectilinearGrid(
                 )
 
 data_path = "/Users/benoitpasquier/Data"
-bson_dir = joinpath(data_path, "OceanGrids")
-println("Saving as BSON file in $bson_dir")
-bson_file = joinpath(bson_dir, "OCIM0.1.bson")
-isdir(bson_dir) || mkdir(bson_dir)
-isfile(bson_file) && rm(bson_file)
-BSON.@save bson_file grid T
+jld2_dir = joinpath(data_path, "OceanGrids")
+println("Saving as JLD2 file in $jld2_dir")
+jld2_file = joinpath(jld2_dir, "OCIM0.1.jld2")
+isdir(jld2_dir) || mkdir(jld2_dir)
+isfile(jld2_file) && rm(jld2_file)
+jldsave(jld2_file, true; grid, T)

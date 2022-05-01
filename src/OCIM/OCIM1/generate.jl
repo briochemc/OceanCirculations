@@ -6,8 +6,10 @@ and adapt it to AIBECS.
 
 using SparseArrays          # For sparse matrix in OCIM
 using DataDeps              # For storage location of data
+using Downloads
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true # so it does not ask me
 using MAT                   # For loading OCIM in MAT format
-using BSON                  # For saving circulation as BSON format
+using JLD2                  # For saving circulation as JLD2 format
 using Unitful               # for units
 using OceanGrids            # To store the grid
 
@@ -16,7 +18,7 @@ function fallback_download(remotepath, localdir)
     @assert(isdir(localdir))
     filename = basename(remotepath)  # only works for URLs with filename as last part of name
     localpath = joinpath(localdir, filename)
-    Base.download(remotepath, localpath)
+    Downloads.download(remotepath, localpath)
     return localpath
 end
 
@@ -93,9 +95,9 @@ grid = OceanRectilinearGrid(
                 )
 
 data_path = "/Users/benoitpasquier/Data"
-bson_dir = joinpath(data_path, "OceanGrids")
-println("Saving as BSON file in $bson_dir")
-bson_file = joinpath(bson_dir, "OCIM1_CTL.bson")
-isdir(bson_dir) || mkdir(bson_dir)
-isfile(bson_file) && rm(bson_file)
-BSON.@save bson_file grid T
+jld2_dir = joinpath(data_path, "OceanGrids")
+println("Saving as JLD2 file in $jld2_dir")
+jld2_file = joinpath(jld2_dir, "OCIM1_CTL.jld2")
+isdir(jld2_dir) || mkdir(jld2_dir)
+isfile(jld2_file) && rm(jld2_file)
+jldsave(jld2_file, true; grid, T)
